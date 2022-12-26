@@ -34,6 +34,9 @@ runs:
     - name: Install Backend Dependencies
       shell: bash
       run: go mod tidy
+    - name: Generate Code
+      shell: bash
+      run: go generate
     - name: Run Build (Bash)
       if: inputs.os != 'windows' || inputs.libusb-path == null
       shell: bash
