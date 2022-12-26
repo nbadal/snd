@@ -28,6 +28,7 @@ require (
 	github.com/webview/webview v0.0.0-20221225125018-b817c55b5602
 	go.bug.st/serial v1.3.5
 	go.etcd.io/bbolt v1.3.3
+	golang.org/x/net v0.2.0
 	gopkg.in/olahol/melody.v1 v1.0.0-20170518105555-d52139073376
 )
 
@@ -77,7 +78,6 @@ require (
 	go.opencensus.io v0.22.5 // indirect
 	golang.org/x/crypto v0.3.0 // indirect
 	golang.org/x/exp v0.0.0-20220303212507-bbda1eaf7a17 // indirect
-	golang.org/x/net v0.2.0 // indirect
 	golang.org/x/sys v0.2.0 // indirect
 	golang.org/x/term v0.2.0 // indirect
 	golang.org/x/text v0.4.0 // indirect

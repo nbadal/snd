@@ -69,7 +69,7 @@ func startElectron(db database.Database, debug bool) {
 		panic(err)
 	}
 
-	var w, _ = a.NewWindow("http://127.0.0.1:7123", &astilectron.WindowOptions{
+	var w, _ = a.NewWindow("http://127.0.0.1:7123/index.html", &astilectron.WindowOptions{
 		Center: astikit.BoolPtr(true),
 		Height: astikit.IntPtr(920),
 		Width:  astikit.IntPtr(1600),

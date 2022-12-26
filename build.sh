@@ -16,7 +16,7 @@ echo "Build Tags : ${SND_TAGS}"
 
 echo "Clearing old data..."
 rm -r build || true
-mkdir -p build/release build/release/frontend/dist build/release/data
+mkdir -p build
 
 echo "Building App..."
 case "${GOOS}" in
@@ -28,16 +28,9 @@ LD_FLAGS="-X github.com/BigJk/snd.GitCommitHash=${GIT_COMMIT} -X github.com/BigJ
 cd cmd/app
 go build -ldflags "${LD_FLAGS}" -o app -tags "${SND_TAGS}"
 cd ../..
-mv cmd/app/app "build/release/Sales & Dungeons${EXT}"
-
-echo "Copying frontend..."
-cp -r frontend/dist build/release/frontend
-
-echo "Copying resources..."
-cp data/icon.png build/release/data/icon.png
-cp data/icon.icns build/release/data/icon.icns
+mv cmd/app/app "build/SND${EXT}"
 
 echo "Building version.txt..."
-echo "Commit: ${GIT_COMMIT}" > build/release/version.txt
-echo "Branch: ${GIT_BRANCH}" >> build/release/version.txt
-echo "Build Time: ${BUILD_TIME}" >> build/release/version.txt
+echo "Commit: ${GIT_COMMIT}" > build/version.txt
+echo "Branch: ${GIT_BRANCH}" >> build/version.txt
+echo "Build Time: ${BUILD_TIME}" >> build/version.txt

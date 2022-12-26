@@ -1,0 +1,15 @@
+pkg: static
+dest: "./static/"
+fmt: false
+tags: ""
+output: "ab0x.go"
+debug: false
+# spread: true
+custom:
+  - files: 
+    - "./frontend/dist/"
+    base: "frontend/dist/"
+  - files: 
+    - "./data/icon.icns"
+    - "./data/icon.png"
+    base: "data/"

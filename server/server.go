@@ -22,6 +22,7 @@ import (
 	"github.com/BigJk/snd/log"
 	"github.com/BigJk/snd/printing"
 	"github.com/BigJk/snd/rpc"
+	"github.com/BigJk/snd/static"
 
 	"github.com/labstack/echo/v4"
 )
@@ -225,9 +226,8 @@ func (s *Server) Start(bind string) error {
 			return strings.HasPrefix(c.Request().URL.Path, "/api") || strings.HasPrefix(c.Request().URL.Path, "/proxy")
 		}, Balancer: middleware.NewRoundRobinBalancer([]*middleware.ProxyTarget{{URL: viteUrl}})}))
 	} else {
-		s.e.Static("/", "./frontend/dist")
+		s.e.GET("/*", echo.WrapHandler(static.Handler))
 	}
-	s.e.Static("/static", "./static")
 	s.e.Use(middleware.CORS())
 
 	s.e.HideBanner = true

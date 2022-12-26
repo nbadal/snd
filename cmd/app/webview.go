@@ -27,7 +27,7 @@ func startWebview(db database.Database, debug bool) {
 	w.SetSize(800, 600, webview.HintNone)
 
 	// Load the start page, index.html
-	w.Navigate("http://localhost:7123/")
+	w.Navigate("http://localhost:7123/index.html")
 
 	// Run the app.
 	w.Run()
