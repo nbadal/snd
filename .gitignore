@@ -14,7 +14,6 @@
 # Dependency directories (remove the comment below to include it)
 # vendor/
 
-static/
 node_modules/
 dist/
 vendor/
@@ -33,3 +32,6 @@ build/
 
 !data/*.png
 !data/*.svg
+
+static/*
+!static/placeholder.go
