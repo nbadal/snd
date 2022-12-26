@@ -9,8 +9,11 @@ import (
 	"github.com/webview/webview"
 )
 
+// var prev preview.WebviewPreview
+
 func init() {
 	startFunc = startWebview
+	// serverOptions = append(serverOptions, server.WithPrinter(&prev))
 }
 
 var w webview.WebView

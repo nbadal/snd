@@ -19,7 +19,7 @@ import (
 	"github.com/asticode/go-astilectron"
 )
 
-var prev preview.Preview
+var prev preview.AstiPreview
 
 // This will change the starting routine so that an additional Electron window
 // will open with the frontend in it.
