@@ -2,7 +2,7 @@ name: Build
 
 on:
   push: 
-    branches: [ matrix-build ]
+    branches: [ pack-assets ]
 
 jobs:
   build-frontend:
