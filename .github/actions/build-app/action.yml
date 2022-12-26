@@ -56,7 +56,7 @@ runs:
     - name: Copy libusb DLL
       if: inputs.libusb-path != null
       shell: bash
-      run: cp ${{inputs.libusb-path}} build/release/
+      run: cp ${{inputs.libusb-path}} build/
     - name: Generate Short SHA
       shell: bash
       id: sha
@@ -64,6 +64,6 @@ runs:
     - name: Archive Build
       uses: actions/upload-artifact@v3
       with:
-        path: build/release/
+        path: build/
         name: ${{ inputs.artifact-name }}-${{ steps.sha.outputs.short }}
         if-no-files-found: error
