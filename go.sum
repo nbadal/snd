@@ -19,6 +19,8 @@ github.com/UnnoTed/fileb0x v1.1.4 h1:IUgFzgBipF/ujNx9wZgkrKOF3oltUuXMSoaejrBws+A
 github.com/UnnoTed/fileb0x v1.1.4/go.mod h1:X59xXT18tdNk/D6j+KZySratBsuKJauMtVuJ9cgOiZs=
 github.com/acomagu/bufpipe v1.0.3 h1:fxAGrHZTgQ9w5QqVItgzwj235/uYZYgbXitB+dLupOk=
 github.com/acomagu/bufpipe v1.0.3/go.mod h1:mxdxdup/WdsKVreO5GpW4+M/1CE2sMG4jeGJ2sYmHc4=
+github.com/akavel/rsrc v0.8.0 h1:zjWn7ukO9Kc5Q62DOJCcxGpXC18RawVtYAGdz2aLlfw=
+github.com/akavel/rsrc v0.8.0/go.mod h1:uLoCtb9J+EyAqh+26kdrTgmzRBFPGOolLWKpdxkKq+c=
 github.com/alexbrainman/printer v0.0.0-20181008173622-345afe414dee h1:YVGQCpzp1Z9/P/9c1uGJBLomn2FEvlPWAz2fJt7G08E=
 github.com/alexbrainman/printer v0.0.0-20181008173622-345afe414dee/go.mod h1:dAASlhAhrwKRSWS7EDsHtphKGj9eN5uCU4XiaAyacG0=
 github.com/andybalholm/cascadia v1.1.0 h1:BuuO6sSfQNFRu1LppgbD25Hr2vLYW25JvxHs5zzsLTo=
@@ -32,8 +34,17 @@ github.com/asdine/storm v2.1.2+incompatible h1:dczuIkyqwY2LrtXPz8ixMrU/OFgZp71kb
 github.com/asdine/storm v2.1.2+incompatible/go.mod h1:RarYDc9hq1UPLImuiXK3BIWPJLdIygvV3PsInK0FbVQ=
 github.com/asticode/go-astikit v0.15.0 h1:mpy55njSQ9SS9gP9vmPAfo08YpRt+4pr5/1emK6DFF0=
 github.com/asticode/go-astikit v0.15.0/go.mod h1:h4ly7idim1tNhaVkdVBeXQZEE3L0xblP7fCWbgwipF0=
+github.com/asticode/go-astikit v0.37.0 h1:FaMrY4m+xUTHgwLdgNbDuEFG27UVJTSlWdPqbRsmgOM=
+github.com/asticode/go-astikit v0.37.0/go.mod h1:h4ly7idim1tNhaVkdVBeXQZEE3L0xblP7fCWbgwipF0=
+github.com/asticode/go-astilectron v0.25.0/go.mod h1:Tx+aS0IvbV0cO4TlQbOO1NFA/lATj11vEStydyIjMjM=
 github.com/asticode/go-astilectron v0.27.0 h1:SbY6xDsPZ+BvQTb/daZpFBTJF5QWzSQ2IEj9destNIw=
 github.com/asticode/go-astilectron v0.27.0/go.mod h1:Tx+aS0IvbV0cO4TlQbOO1NFA/lATj11vEStydyIjMjM=
+github.com/asticode/go-astilectron-bootstrap v0.4.14 h1:xLL9LCk2azGwzCA80spicBltpNyQvirHmIatexlX/nw=
+github.com/asticode/go-astilectron-bootstrap v0.4.14/go.mod h1:2rG6AtLIU/q4Kor4ZBPOAcE/zCQjThVUyy7TRWWeI2w=
+github.com/asticode/go-astilectron-bundler v0.7.12 h1:NpVYzSkAvi2uxcPWapDjQscgbwpfh2OJ/tgO0dw17gE=
+github.com/asticode/go-astilectron-bundler v0.7.12/go.mod h1:0p8rjecxoyaUahllWY6U1dhO89RpTaV+gUkCk04bVPQ=
+github.com/asticode/go-bindata v1.0.0 h1:5whO0unjdx2kbAbzoBMS3307jKAEf3oQ1lJcx5RdgA8=
+github.com/asticode/go-bindata v1.0.0/go.mod h1:t/Y+/iCLrvaYkv8Y6PscRnyUeYzy9y9+8JC9CMcKdHY=
 github.com/bmatcuk/doublestar v1.1.1 h1:YroD6BJCZBYx06yYFEWvUuKVWQn3vLLQAVmDmvTSaiQ=
 github.com/bmatcuk/doublestar v1.1.1/go.mod h1:UD6OnuiIn0yFxxA2le/rnRU1G4RaI4UvFv1sNto9p6w=
 github.com/bwesterb/go-ristretto v1.2.0/go.mod h1:fUIoIZaG73pV5biE2Blr2xEzDoMj7NFEuV9ekS419A0=
@@ -179,6 +190,8 @@ github.com/pkg/errors v0.9.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINE
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/russross/blackfriday v1.5.2/go.mod h1:JO/DiYxRf+HjHt06OyowR9PTA263kcR/rfWxYHBV53g=
+github.com/sam-kamerer/go-plister v1.2.0 h1:ZdEF1bhPUoGzwz5eFljw2K/A+oRXq/81jul/A3CHKEY=
+github.com/sam-kamerer/go-plister v1.2.0/go.mod h1:gTt1Ko2oTA5bfDYsNcLjRGyyx6LPxHIeo0ZTtTRZG2I=
 github.com/samber/lo v1.11.0 h1:JfeYozXL1xfkhRUFOfH13ociyeiLSC/GRJjGKI668xM=
 github.com/samber/lo v1.11.0/go.mod h1:2I7tgIv8Q1SG2xEIkRq0F2i2zgxVpnyPOP0d3Gj2r+A=
 github.com/sergi/go-diff v1.1.0 h1:we8PVUC3FE2uYfodKH/nBHMSetSfHDR6scGdBi+erh0=

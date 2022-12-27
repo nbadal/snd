@@ -11,8 +11,9 @@ require (
 	github.com/UnnoTed/fileb0x v1.1.4
 	github.com/alexbrainman/printer v0.0.0-20181008173622-345afe414dee
 	github.com/asdine/storm v2.1.2+incompatible
-	github.com/asticode/go-astikit v0.15.0
+	github.com/asticode/go-astikit v0.37.0
 	github.com/asticode/go-astilectron v0.27.0
+	github.com/asticode/go-astilectron-bootstrap v0.4.14
 	github.com/dgraph-io/badger/v3 v3.2103.2
 	github.com/fatih/color v1.9.0
 	github.com/fsnotify/fsnotify v1.5.1
@@ -40,7 +41,10 @@ require (
 	github.com/ProtonMail/go-crypto v0.0.0-20221026131551-cf6655e29de4 // indirect
 	github.com/Sereal/Sereal v0.0.0-20200210135736-180ff2394e8a // indirect
 	github.com/acomagu/bufpipe v1.0.3 // indirect
+	github.com/akavel/rsrc v0.8.0 // indirect
 	github.com/andybalholm/cascadia v1.1.0 // indirect
+	github.com/asticode/go-astilectron-bundler v0.7.12 // indirect
+	github.com/asticode/go-bindata v1.0.0 // indirect
 	github.com/bmatcuk/doublestar v1.1.1 // indirect
 	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/cespare/xxhash/v2 v2.1.1 // indirect
@@ -74,6 +78,7 @@ require (
 	github.com/nsf/termbox-go v0.0.0-20190121233118-02980233997d // indirect
 	github.com/pjbgf/sha1cd v0.2.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
+	github.com/sam-kamerer/go-plister v1.2.0 // indirect
 	github.com/sergi/go-diff v1.1.0 // indirect
 	github.com/skeema/knownhosts v1.1.0 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect

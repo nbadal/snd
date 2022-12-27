@@ -1,0 +1,9 @@
+{
+    "app_name": "SND",
+    "icon_path_darwin": "../../data/icon.icns",
+    "icon_path_linux": "../../data/icon.png",
+    "build_flags": {
+        "tags": "ASTI LIBUSB"
+    },
+    "output_path": "../../build"
+}

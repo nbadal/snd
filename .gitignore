@@ -20,6 +20,7 @@ vendor/
 templates/
 userdata/
 
+.vscode/
 .idea/
 .cache/
 cache/
@@ -33,5 +34,9 @@ build/
 !data/*.png
 !data/*.svg
 
+# fileb0x
 static/*
 !static/placeholder.go
+
+# bundler
+cmd/app/bind*
