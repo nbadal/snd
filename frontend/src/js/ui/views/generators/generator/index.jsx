@@ -5,6 +5,7 @@ import { inElectron, openFolderDialog } from '/js/electron';
 import { ModalInfo } from './modals';
 
 import api from '/js/core/api';
+import * as fileApi from '/js/core/file-api';
 import { render } from '/js/core/generator';
 import store from '/js/core/store';
 
@@ -68,7 +69,7 @@ export default function () {
 								.exportGeneratorZip(state.id, folder)
 								.then((file) => success('Wrote ' + file))
 								.catch(error)
-								.then(() => (state.showExport = false));
+								.finally(() => (state.showExport = false));
 						});
 					} else {
 						window.open('/api/export/generator/zip/' + state.id, '_blank');
@@ -77,14 +78,19 @@ export default function () {
 				}
 				break;
 			case 'folder':
-				{
-					openFolderDialog().then((folder) => {
-						api
-							.exportGeneratorFolder(state.id, folder)
-							.then((file) => success('Wrote ' + file))
-							.catch(error)
-							.then(() => (state.showExport = false));
-					});
+				if (inElectron) {
+					openFolderDialog()
+						.then((folder) => api.exportGeneratorFolder(state.id, folder))
+						.then((file) => success('Wrote ' + file))
+						.catch(error)
+						.finally(() => (state.showExport = false));
+				} else if (fileApi.hasFileApi) {
+					Promise.all([fileApi.openFolderDialog(true), api.exportGeneratorJSON(state.id)])
+						.then(([folder, json]) => fileApi.writeJSONToFolder(folder, json))
+						.catch(error)
+						.finally(() => (state.showExport = false));
+				} else {
+					error('Browser does not support File API');
 				}
 				break;
 		}
@@ -110,7 +116,7 @@ export default function () {
 						.print(res)
 						.then(() => success('Printing send'))
 						.catch(error)
-						.then(() => {
+						.finally(() => {
 							if (last) {
 								state.printing = false;
 							}
@@ -121,6 +127,13 @@ export default function () {
 
 		state.config.seed = Math.ceil(Math.random() * 1000000000);
 		updateRender().then(m.redraw);
+	};
+
+	let screenshot = () => {
+		openFolderDialog().then((folder) => {
+			let file = folder + '/' + state.config.seed + '.png';
+			api.screenshot(state.rendered, folder + '/' + state.config.seed + '.png').then(() => success(`Screenshot '${file}' created`), error);
+		});
 	};
 
 	let body = (vnode) => {
@@ -146,9 +159,14 @@ export default function () {
 							<div className='flex-grow-1 mr2'>
 								<Input value={state.amount} oninput={binder.inputNumber(state, 'amount')} />
 							</div>
-							<div className='w-80 btn btn-success' onclick={print}>
+							<div className='w-70 btn btn-success mr2' onclick={print}>
 								<i className='ion ion-md-print mr1' /> Print
 							</div>
+							<Tooltip content='Screenshot the currently generated template.'>
+								<div className='w-10 btn btn-primary' onclick={screenshot}>
+									<i className='ion ion-md-camera' />
+								</div>
+							</Tooltip>
 						</div>
 					</div>
 				</div>
@@ -181,6 +199,11 @@ export default function () {
 							<div className='btn btn-primary mr2' onclick={() => m.route.set(`/generators/${vnode.attrs.id}/edit`)}>
 								Edit
 							</div>
+							<Tooltip content='Duplicate'>
+								<div className='btn btn-primary mr2' onclick={() => m.route.set(`/generators/dupe/${state.id}`)}>
+									<i className='ion ion-md-copy' />
+								</div>
+							</Tooltip>
 							<Tooltip content='Export Options'>
 								<div className='btn btn-primary w2 mr2' onclick={() => (state.showExport = true)}>
 									<i className='ion ion-md-open' />

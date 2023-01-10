@@ -1,8 +1,9 @@
 import { debounce, map, pickBy, uniq } from 'lodash-es';
 
-import api from '/js/core/api';
+import { fetchMultipleEntries } from '/js/core/api-helper';
 import { render } from '/js/core/generator';
 import htmlFormat from '/js/core/html-format';
+import { dataSourceId } from '/js/core/model-helper';
 import snippets from '/js/core/snippets';
 import store from '/js/core/store';
 
@@ -10,12 +11,13 @@ import { Editor, GeneratorConfig, Input, Loading, Select, SplitView, Switch, Tex
 import Types from '/js/ui/components/generator/types';
 
 import binder from '/js/ui/binder';
-import { dialogWarning } from '/js/ui/toast';
+import { dialogWarning, error } from '/js/ui/toast';
 
 export default () => {
 	let state = {
 		target: null,
 		editMode: false,
+		rendering: false,
 		lastRender: '',
 		selectedTab: '',
 		selectedSource: '',
@@ -44,6 +46,7 @@ export default () => {
 
 	let updateRender = debounce(() => {
 		state.templateErrors = [];
+		state.rendering = true;
 
 		sanitizeConfig();
 
@@ -54,16 +57,27 @@ export default () => {
 			.catch((err) => {
 				state.templateErrors = [err];
 			})
-			.then(m.redraw);
+			.finally(() => {
+				state.rendering = false;
+				m.redraw();
+			});
 
 		if (state.onRender) {
 			state.onRender(state.lastRender);
 		}
+
+		m.redraw();
 	}, 1000);
 
 	let updateRenderSanitize = () => {
 		sanitizeConfig();
 		updateRender();
+	};
+
+	let updateEntries = () => {
+		fetchMultipleEntries(state.target.dataSources ?? [])
+			.then((entries) => (state.entries = entries))
+			.catch(error);
 	};
 
 	let tabs = {
@@ -164,7 +178,7 @@ export default () => {
 				<Select
 					label='Add Sources'
 					selected={state.selectedSource}
-					keys={store.data.sources?.map((s) => `ds:${s.author}+${s.slug}`)}
+					keys={store.data.sources?.map(dataSourceId)}
 					names={store.data.sources?.map((s) => `${s.name} (${s.author})`)}
 					oninput={(e) => (state.selectedSource = e.target.value)}
 				/>
@@ -181,6 +195,8 @@ export default () => {
 						state.target.dataSources.push(state.selectedSource);
 						state.target.dataSources = uniq(state.target.dataSources);
 						state.selectedSource = '';
+
+						updateEntries();
 					}}
 				>
 					Add Source
@@ -230,7 +246,7 @@ export default () => {
 						</div>
 						<div className='w-50 flex-shrink-0 pr3'>
 							<Select
-								label='Printer Type'
+								label='Type'
 								keys={Object.keys(Types)}
 								names={Object.keys(Types).map((key) => Types[key].name)}
 								selected={val.type}
@@ -318,25 +334,22 @@ export default () => {
 				seed: 'TEST_SEED',
 			};
 
-			if (state.editMode) {
-				api.getEntriesWithSources(`gen:${state.target.author}+${state.target.slug}`).then((entries) => {
-					state.entries = entries ?? [];
-				});
-			}
-
+			updateEntries();
 			updateRender();
 		},
 		view(vnode) {
-			if (!state.target || !state.entries) {
+			if (!state.target || state.entries === null) {
 				return <Loading />;
 			}
 
 			return (
 				<SplitView
 					content={state.lastRender}
+					devTools={true}
 					width={340}
 					scale={340.0 / store.data.settings.printerWidth}
 					stylesheets={store.data.settings.stylesheets}
+					loading={state.rendering}
 				>
 					<ul className='tab tab-block tab-m0 flex-shrink-0'>
 						{map(tabs, (v, k) => (

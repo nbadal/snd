@@ -18,6 +18,7 @@ node_modules/
 dist/
 vendor/
 templates/
+!src/**/templates/**
 userdata/
 
 .vscode/

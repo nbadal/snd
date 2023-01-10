@@ -13,8 +13,10 @@ import (
 	_ "image/png"
 	"net/url"
 	"os"
+	"runtime"
 	"time"
 
+	"github.com/BigJk/snd/log"
 	"github.com/go-rod/rod/lib/launcher"
 
 	"github.com/go-rod/rod"
@@ -23,24 +25,44 @@ import (
 
 var browser *rod.Browser
 
-func init() {
-	initBrowser()
-}
-
-func initBrowser() {
+func InitBrowser() {
 	if browser != nil {
 		_ = browser.Close()
 	}
 
-	if os.Getenv("SND_DEBUG") == "1" {
-		l := launcher.New().
-			Headless(false).
-			Devtools(true)
-
-		browser = rod.New().ControlURL(l.MustLaunch()).MustConnect()
-	} else {
-		browser = rod.New().MustConnect()
+	// if you want rod to connect to a custom chrome instance instead of downloading and
+	// auto connecting you can set the SND_CHROME_ADDR to the address of target instance.
+	// Input might look like: 2814, 127.0.0.1:2814, ws://127.0.0.1:2814, ...
+	//
+	// you can use the rod docker container:
+	// - https://github.com/go-rod/rod/pkgs/container/rod
+	// - https://github.com/go-rod/rod/blob/master/lib/examples/connect-browser/main.go#L21
+	customChromeUrl := os.Getenv("SND_CHROME_ADDR")
+	if len(customChromeUrl) > 0 {
+		u := launcher.MustResolveURL(customChromeUrl)
+		browser = rod.New().ControlURL(u).MustConnect()
+		return
 	}
+
+	l := launcher.New()
+
+	// disable leakless for now on windows (https://github.com/BigJk/snd/issues/28)
+	if runtime.GOOS == "windows" {
+		log.Info("disabling leakless on windows")
+		l = l.Leakless(false)
+	}
+
+	// if SND_CHROME_DEBUG=1 we start the chrome instance in non-headless and with opened
+	// devtools so that we can see and debug the rendering that happens.
+	if os.Getenv("SND_CHROME_DEBUG") == "1" {
+		l = l.Headless(false).Devtools(true)
+	}
+
+	browser = rod.New().ControlURL(l.MustLaunch()).MustConnect()
+}
+
+func Shutdown() error {
+	return browser.Close()
 }
 
 func tryOpenPage(url string) (*rod.Page, error) {
@@ -58,7 +80,7 @@ func tryOpenPage(url string) (*rod.Page, error) {
 
 		// if the pc has gone into standby the cdp session closes,
 		// so we try to init it again and try once more.
-		initBrowser()
+		InitBrowser()
 	}
 
 	// after retry return last error

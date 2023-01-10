@@ -14,6 +14,7 @@ import api from '/js/core/api';
 import store from '/js/core/store';
 
 import DataSources from '/js/ui/views/data-sources';
+import DataSource from '/js/ui/views/data-sources/data-source';
 import Devices from '/js/ui/views/devices';
 import ExternPrintGenerator from '/js/ui/views/extern-print/generator';
 import ExternPrintTemplate from '/js/ui/views/extern-print/template';
@@ -87,11 +88,24 @@ store.sub(['reload_public_packages'], () => {
 	});
 });
 
+store.sub(['reload_new_version'], () => {
+	api
+		.newVersion()
+		.then((newVersion) => {
+			store.set('newVersion', newVersion);
+		})
+		.catch((err) => {
+			console.log(err);
+			store.set('newVersion', false);
+		});
+});
+
 store.pub('reload_settings');
 store.pub('reload_templates');
 store.pub('reload_generators');
 store.pub('reload_sources');
 store.pub('reload_public_packages');
+store.pub('reload_new_version');
 
 // Wait for settings to populate and then mount
 
@@ -104,18 +118,21 @@ let wait = setInterval(() => {
 		'/': Templates,
 		'/templates': Templates,
 		'/templates/new': TemplatesNew,
+		'/templates/dupe/:id': TemplatesNew,
 		'/templates/:id': Template,
 		'/templates/:id/edit': TemplatesEdit,
 		'/templates/:id/edit/:eid': TemplateEdit,
 		'/templates/:id/new': TemplateNew,
 		'/generators': Generators,
 		'/generators/new': GeneratorsNew,
+		'/generators/dupe/:id': GeneratorsNew,
 		'/generators/:id/edit': GeneratorsEdit,
 		'/generators/:id': Generator,
 		'/workshop': Workshop,
 		'/workshop/:id': WorkshopRepo,
 		'/help': Help,
 		'/data-sources': DataSources,
+		'/data-sources/:id': DataSource,
 		'/settings': Settings,
 		'/devices': Devices,
 		'/extern-print/template/:id/:json': ExternPrintTemplate,

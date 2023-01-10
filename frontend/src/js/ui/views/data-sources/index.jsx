@@ -3,10 +3,16 @@ import { groupBy, map } from 'lodash-es';
 import { inElectron, openFileDialog, openFolderDialog } from '/js/electron';
 import { readFile } from '/js/file';
 
-import api from '/js/core/api';
-import store from '/js/core/store';
+import { ModalCreate, ModalDuplicate } from './modals';
 
-import { Base, Header, Input, ModalExport, ModalImport, PreviewBox, Tooltip } from '/js/ui/components';
+import api from '/js/core/api';
+import * as fileApi from '/js/core/file-api';
+import { validBaseInformation } from '/js/core/model-helper';
+import { dataSourceId } from '/js/core/model-helper';
+import store from '/js/core/store';
+import { dataSourceById } from '/js/core/store-helper';
+
+import { Base, Header, Input, ModalExport, ModalImport, Tooltip } from '/js/ui/components';
 
 import binder from '/js/ui/binder';
 import { dialogWarning, error, success } from '/js/ui/toast';
@@ -14,6 +20,12 @@ import { dialogWarning, error, success } from '/js/ui/toast';
 export default () => {
 	let state = {
 		search: '',
+		showCreate: false,
+		duplicate: {
+			show: false,
+			id: '',
+			ds: null,
+		},
 		importing: {
 			show: false,
 			loading: false,
@@ -25,7 +37,7 @@ export default () => {
 		},
 	};
 
-	let onimport = (type, url) => {
+	let onimport = (type, importData) => {
 		switch (type) {
 			case 'zip':
 				{
@@ -39,7 +51,7 @@ export default () => {
 									store.pub('reload_sources');
 								})
 								.catch(error)
-								.then(() => {
+								.finally(() => {
 									state.importing.show = false;
 									state.importing.loading = false;
 								});
@@ -55,7 +67,7 @@ export default () => {
 									store.pub('reload_sources');
 								})
 								.catch(error)
-								.then(() => {
+								.finally(() => {
 									state.importing.show = false;
 									state.importing.loading = false;
 								});
@@ -64,36 +76,55 @@ export default () => {
 				}
 				break;
 			case 'folder':
-				{
-					openFolderDialog().then((folder) => {
-						state.importing.loading = true;
-						api
-							.importSourceFolder(folder)
-							.then((name) => {
-								success(`Imported '${name}' successful`);
-
-								store.pub('reload_sources');
-							})
-							.catch(error)
-							.then(() => {
-								state.importing.show = false;
-								state.importing.loading = false;
-							});
-					});
+				if (inElectron) {
+					openFolderDialog()
+						.then((folder) => {
+							state.importing.loading = true;
+							return api.importSourceFolder(folder);
+						})
+						.then((name) => {
+							success(`Imported '${name}' successful`);
+							store.pub('reload_sources');
+						})
+						.catch(error)
+						.finally(() => {
+							state.importing.show = false;
+							state.importing.loading = false;
+						});
+				} else if (fileApi.hasFileApi) {
+					fileApi
+						.openFolderDialog(false)
+						.then((folder) => {
+							state.importing.loading = true;
+							return fileApi
+								.folderToJSON(folder)
+								.then((folderJsonString) => api.importSourceJSON(folderJsonString))
+								.then(() => {
+									success(`Imported '${folder.name}' successful`);
+									store.pub('reload_sources');
+								});
+						})
+						.catch(error)
+						.finally(() => {
+							state.importing.show = false;
+							state.importing.loading = false;
+						});
+				} else {
+					error('Browser does not support File API');
 				}
 				break;
 			case 'url':
 				{
 					state.importing.loading = true;
 					api
-						.importSourceUrl(url)
+						.importSourceUrl(importData)
 						.then((name) => {
 							success(`Imported '${name}' successful`);
 
 							store.pub('reload_sources');
 						})
 						.catch(error)
-						.then(() => {
+						.finally(() => {
 							state.importing.show = false;
 							state.importing.loading = false;
 						});
@@ -111,7 +142,7 @@ export default () => {
 									store.pub('reload_sources');
 								})
 								.catch(error)
-								.then(() => {
+								.finally(() => {
 									state.importing.show = false;
 									state.importing.loading = false;
 								});
@@ -133,7 +164,34 @@ export default () => {
 									store.pub('reload_sources');
 								})
 								.catch(error)
+								.finally(() => {
+									state.importing.show = false;
+									state.importing.loading = false;
+								});
+						});
+					} else {
+						// TODO: error
+					}
+				}
+				break;
+			case 'fc5e':
+				{
+					if (importData.name.length === 0 || importData.author.length === 0 || importData.slug.length === 0 || importData.description.length === 0) {
+						error('Please fill in all information.');
+						return;
+					}
+
+					if (inElectron) {
+						openFileDialog().then((file) => {
+							state.importing.loading = true;
+							api
+								.importFC5eCompedium(file, importData.name, importData.author, importData.slug, importData.description)
 								.then(() => {
+									success(`Imported compedium successful`);
+									store.pub('reload_sources');
+								})
+								.catch(error)
+								.finally(() => {
 									state.importing.show = false;
 									state.importing.loading = false;
 								});
@@ -156,7 +214,7 @@ export default () => {
 								.exportSourceZip(state.exporting.id, folder)
 								.then((file) => success('Wrote ' + file))
 								.catch(error)
-								.then(() => (state.exporting.show = false));
+								.finally(() => (state.exporting.show = false));
 						});
 					} else {
 						// TODO: headless export
@@ -165,17 +223,66 @@ export default () => {
 				}
 				break;
 			case 'folder':
-				{
-					openFolderDialog().then((folder) => {
-						api
-							.exportSourceFolder(state.exporting.id, folder)
-							.then((file) => success('Wrote ' + file))
-							.catch(error)
-							.then(() => (state.exporting.show = false));
-					});
+				if (inElectron) {
+					openFolderDialog()
+						.then((folder) => api.exportSourceFolder(state.exporting.id, folder))
+						.then((file) => success('Wrote ' + file))
+						.catch(error)
+						.finally(() => (state.exporting.show = false));
+				} else if (fileApi.hasFileApi) {
+					Promise.all([fileApi.openFolderDialog(true), api.exportSourceJSON(state.exporting.id)])
+						.then(([folder, json]) => fileApi.writeJSONToFolder(folder, json))
+						.then(() => success('Saved'))
+						.catch(error)
+						.finally(() => (state.exporting.show = false));
+				} else {
+					error('Browser does not support File API');
 				}
 				break;
 		}
+	};
+
+	let createDataSource = (data, skipNavigate, cb) => {
+		let { valid, reason } = validBaseInformation(data);
+
+		if (!valid) {
+			error(reason);
+			return;
+		}
+
+		// check if data source with same id already exists
+		if (dataSourceById(dataSourceId(data))) {
+			error('This Data Source already exists');
+			return;
+		}
+
+		return api
+			.saveSource(data)
+			.then(() => {
+				success('Data Source saved');
+
+				if (skipNavigate) {
+					return;
+				}
+
+				store.pub('reload_sources');
+				m.route.set(`/data-sources/${dataSourceId(data)}`);
+			})
+			.then(cb)
+			.catch(error);
+	};
+
+	let duplicateDataSource = (data) => {
+		createDataSource(data, true, () => {
+			api
+				.copyEntries(state.duplicate.id, dataSourceId(data))
+				.then(() => {
+					success('Data Source duplicated');
+					store.pub('reload_sources');
+					m.route.set(`/data-sources/${dataSourceId(data)}`);
+				})
+				.catch(error);
+		});
 	};
 
 	let body = () => (
@@ -190,47 +297,72 @@ export default () => {
 						<div className='mb2 f5'>
 							Sources by <b>{key}</b>
 						</div>
-						<div className='flex flex-wrap'>
-							{val.map((t, i) => (
-								<PreviewBox
-									className={`w-50 ${(i & 1) === 0 ? 'pr2' : ''}`}
-									value={t}
-									bottomLeft={
-										<div className='lh-solid'>
-											<div className='f4 b'>{t.count}</div>
-											<span className='fw4 f6 black-50'>Entries</span>
-										</div>
-									}
-									bottomRight={
-										<div>
-											<Tooltip content='Export Options'>
-												<div
-													className='btn btn-primary w2 mr2'
-													onclick={() => {
-														state.exporting.ds = t;
-														state.exporting.id = `ds:${t.author}+${t.slug}`;
-														state.exporting.show = true;
-													}}
-												>
-													<i className='ion ion-md-open' />
+						<div className='bg-white pa2 ba b--black-10'>
+							<table className='table lh-copy'>
+								<thead>
+									<tr>
+										<th className='w-40'>Name</th>
+										<th className='w-30'>Description</th>
+										<th className='w-10'>Entries</th>
+										<th className='w-20' />
+									</tr>
+								</thead>
+								<tbody>
+									{val.map((t) => (
+										<tr>
+											<td>
+												<div className='b'>{t.name}</div>
+												<div className='f8 text-muted'>{dataSourceId(t)}</div>
+											</td>
+											<td className='f8'>{t.description}</td>
+											<td>{t.count}</td>
+											<td>
+												<div className='flex items-center justify-end'>
+													<div className='btn btn-sm mr2' onclick={() => m.route.set(`/data-sources/${dataSourceId(t)}`)}>
+														Edit Source
+													</div>
+													<Tooltip content='Export Options'>
+														<div
+															className='btn btn-sm btn-primary w2 mr2'
+															onclick={() => {
+																state.exporting.ds = t;
+																state.exporting.id = dataSourceId(t);
+																state.exporting.show = true;
+															}}
+														>
+															<i className='ion ion-md-open' />
+														</div>
+													</Tooltip>
+													<Tooltip content='Duplicate'>
+														<div
+															className='btn btn-sm btn-primary w2 mr2'
+															onclick={() => {
+																state.duplicate.show = true;
+																state.duplicate.id = dataSourceId(t);
+																state.duplicate.ds = t;
+															}}
+														>
+															<i className='ion ion-md-copy' />
+														</div>
+													</Tooltip>
+													<div
+														className='btn btn-sm btn-error'
+														onclick={() =>
+															dialogWarning(`Do you really want to delete the '${t.name}' source ?`).then(() =>
+																api.deleteSource(dataSourceId(t)).then(() => {
+																	store.pub('reload_sources');
+																})
+															)
+														}
+													>
+														<i className='ion ion-md-close-circle-outline' />
+													</div>
 												</div>
-											</Tooltip>
-											<div
-												className='btn btn-error'
-												onclick={() =>
-													dialogWarning(`Do you really want to delete the '${t.name}' source ?`).then(() =>
-														api.deleteSource(`ds:${t.author}+${t.slug}`).then(() => {
-															store.pub('reload_sources');
-														})
-													)
-												}
-											>
-												<i className='ion ion-md-close-circle-outline' />
-											</div>
-										</div>
-									}
-								/>
-							))}
+											</td>
+										</tr>
+									))}
+								</tbody>
+							</table>
 						</div>
 					</div>
 				)
@@ -255,6 +387,9 @@ export default () => {
 				<Base active='dataSources'>
 					<div className='h-100 flex flex-column'>
 						<Header title='Data Sources' subtitle='Manage collection of data.'>
+							<div className='btn btn-success mr2' onclick={() => (state.showCreate = true)}>
+								Create New
+							</div>
 							<Tooltip content='Import'>
 								<div className='btn btn-primary' onclick={() => (state.importing.show = true)}>
 									<i className='ion ion-md-log-in' />
@@ -264,40 +399,19 @@ export default () => {
 							<Input placeholder='Search...' value={state.search} oninput={binder.inputString(state, 'search')} />
 						</Header>
 						{body()}
+						<ModalDuplicate
+							target={state.duplicate.ds}
+							show={state.duplicate.show}
+							onclose={() => (state.duplicate.show = false)}
+							onconfirm={duplicateDataSource}
+						/>
+						<ModalCreate show={state.showCreate} onclose={() => (state.showCreate = false)} onconfirm={createDataSource} />
 						<ModalImport
 							type='data source'
 							show={state.importing.show}
 							onimport={onimport}
 							onclose={() => (state.importing.show = false)}
-							extra={
-								<div>
-									<div className='mt3'>
-										<div className='divider' />
-										<div>
-											<div className='mt2 mb3 lh-copy'>
-												<b className='db'>CSV Import</b>
-												You can also import data from simple CSV files that you exported from Google Sheets or Excel.
-											</div>
-											<div className='btn btn-primary mr2' onclick={() => onimport('csv')}>
-												Import CSV (data.csv)
-											</div>
-										</div>
-									</div>
-									<div className='mt3'>
-										<div className='divider' />
-										<div>
-											<div className='mt2 mb3 lh-copy'>
-												<b className='db'>FoundryVTT Import</b>
-												You can also import data from FoundryVTT Modules and Systems. This will convert all the included packs and add them as Data
-												Sources. To import a Module or System open the module.json or system.json file in it's folder.
-											</div>
-											<div className='btn btn-primary mr2' onclick={() => onimport('vtt')}>
-												Import FoundryVTT (module.json, system.json)
-											</div>
-										</div>
-									</div>
-								</div>
-							}
+							types={['base', 'csv', 'vtt', 'fc5e']}
 						/>
 						<ModalExport
 							type='data source'

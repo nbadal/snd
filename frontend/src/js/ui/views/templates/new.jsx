@@ -1,6 +1,8 @@
 import api from '/js/core/api';
 import { NewTemplate } from '/js/core/factory';
+import { templateId, validBaseInformation } from '/js/core/model-helper';
 import store from '/js/core/store';
+import { templateById } from '/js/core/store-helper';
 
 import { Base, Header, TemplateEdit } from '/js/ui/components';
 
@@ -28,6 +30,16 @@ export default () => {
 	);
 
 	return {
+		oninit(vnode) {
+			if (vnode.attrs.id) {
+				let dupeTemplate = templateById(vnode.attrs.id);
+				if (dupeTemplate) {
+					state.template = dupeTemplate;
+					state.template.name += ' Copy';
+					state.template.slug += '-copy';
+				}
+			}
+		},
 		view(vnode) {
 			return (
 				<Base active='templates'>
@@ -36,16 +48,32 @@ export default () => {
 							<div
 								className='btn btn-success'
 								onclick={() => {
-									if (state.template.name.length === 0) {
-										error('Please insert a name');
+									let { valid, reason } = validBaseInformation(state.template);
+
+									if (!valid) {
+										error(reason);
 										return;
 									}
 
-									api.saveTemplate(state.template).then(() => {
-										success('Template saved');
-										store.pub('reload_templates');
-										m.route.set('/templates');
-									}, error);
+									if (templateById(vnode.attrs.id)) {
+										error('This template already exists');
+										return;
+									}
+
+									api
+										.saveTemplate(state.template)
+										.then(() => {
+											// if this is a duplication we want to copy the entries from the original to the duplicated.
+											if (vnode.attrs.id) {
+												return api.copyEntries(vnode.attrs.id, templateId(state.template));
+											}
+										})
+										.then(() => {
+											success('Template saved');
+											store.pub('reload_templates');
+											m.route.set('/templates');
+										})
+										.catch(error);
 								}}
 							>
 								Save

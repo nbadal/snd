@@ -1,6 +1,8 @@
 import api from '/js/core/api';
 import { NewGenerator } from '/js/core/factory';
+import { validBaseInformation } from '/js/core/model-helper';
 import store from '/js/core/store';
+import { generatorById } from '/js/core/store-helper';
 
 import { Base, GeneratorEdit, Header } from '/js/ui/components';
 
@@ -22,6 +24,16 @@ export default () => {
 	};
 
 	return {
+		oninit(vnode) {
+			if (vnode.attrs.id) {
+				let dupeGenerator = generatorById(vnode.attrs.id);
+				if (dupeGenerator) {
+					state.generator = dupeGenerator;
+					state.generator.name += ' Copy';
+					state.generator.slug += '-copy';
+				}
+			}
+		},
 		view(vnode) {
 			return (
 				<Base active='generators'>
@@ -30,8 +42,15 @@ export default () => {
 							<div
 								className='btn btn-success'
 								onclick={() => {
-									if (state.generator.name.length === 0) {
-										error('Please insert a name');
+									let { valid, reason } = validBaseInformation(state.generator);
+
+									if (!valid) {
+										error(reason);
+										return;
+									}
+
+									if (generatorById(vnode.attrs.id)) {
+										error('This generator already exists');
 										return;
 									}
 

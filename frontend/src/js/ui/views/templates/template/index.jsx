@@ -5,6 +5,7 @@ import { inElectron, openFolderDialog } from '/js/electron';
 import { ModalInfo, ModalSync } from './modals';
 
 import api from '/js/core/api';
+import * as fileApi from '/js/core/file-api';
 import store from '/js/core/store';
 import { render } from '/js/core/templating';
 import { keepOpen, on } from '/js/core/ws';
@@ -40,19 +41,23 @@ export default () => {
 		printing: false,
 	};
 
-	let getSelectedTemplate = () => {
-		if (state.renderedTemplate.id !== state.selected.id) {
-			state.renderedTemplate.id = state.selected.id;
+	let renderTemplate = () => {
+		state.renderedTemplate.id = state.selected.id;
 
-			render(state.template.printTemplate, {
-				it: state.selected.data ?? state.template.skeletonData,
-				images: state.template.images,
-			}).then((res) => {
-				if (state.renderedTemplate.id === state.selected.id) {
-					state.renderedTemplate.template = res;
-					m.redraw();
-				}
-			});
+		render(state.template.printTemplate, {
+			it: state.selected.data ?? state.template.skeletonData,
+			images: state.template.images,
+		}).then((res) => {
+			if (state.renderedTemplate.id === state.selected.id) {
+				state.renderedTemplate.template = res;
+				m.redraw();
+			}
+		});
+	};
+
+	let getSelectedTemplate = () => {
+		if (state.renderedTemplate.id !== state.selected.id || state.renderedTemplate.template.length === 0) {
+			renderTemplate();
 		}
 
 		return state.renderedTemplate.template;
@@ -133,7 +138,7 @@ export default () => {
 								.exportTemplateZip(state.template.id, folder)
 								.then(() => success('Wrote ' + folder))
 								.catch(error)
-								.then(() => (state.showExport = false));
+								.finally(() => (state.showExport = false));
 						});
 					} else {
 						window.open('/api/export/template/zip/' + state.template.id, '_blank');
@@ -141,14 +146,20 @@ export default () => {
 				}
 				break;
 			case 'folder':
-				{
-					openFolderDialog().then((folder) => {
-						api
-							.exportTemplateFolder(state.template.id, folder)
-							.then((file) => success('Wrote ' + file))
-							.catch(error)
-							.then(() => (state.showExport = false));
-					});
+				if (inElectron) {
+					openFolderDialog()
+						.then((folder) => api.exportTemplateFolder(state.template.id, folder))
+						.then((file) => success('Wrote ' + file))
+						.catch(error)
+						.finally(() => (state.showExport = false));
+				} else if (fileApi.hasFileApi) {
+					Promise.all([fileApi.openFolderDialog(true), api.exportTemplateJSON(state.template.id)])
+						.then(([folder, json]) => fileApi.writeJSONToFolder(folder, json))
+						.then(() => success('Saved'))
+						.catch(error)
+						.finally(() => (state.showExport = false));
+				} else {
+					error('Browser does not support File API');
 				}
 				break;
 		}
@@ -350,14 +361,8 @@ export default () => {
 					state.template = template;
 					state.template.id = vnode.attrs.id;
 
-					// Render skeleton template
-					render(state.template.printTemplate, {
-						it: state.template.skeletonData,
-						images: state.template.images,
-					}).then((res) => {
-						state.renderedTemplate.template = res;
-						m.redraw();
-					});
+					// Render template
+					renderTemplate();
 				})
 				.then(loadEntries);
 
@@ -397,7 +402,12 @@ export default () => {
 									Edit
 								</div>
 							) : null}
-							<Tooltip content='Import & Export'>
+							<Tooltip content='Duplicate'>
+								<div className='btn btn-primary mr2' onclick={() => m.route.set(`/templates/dupe/${state.template.id}`)}>
+									<i className='ion ion-md-copy' />
+								</div>
+							</Tooltip>
+							<Tooltip content='Export'>
 								<div className='btn btn-primary mr2' onclick={() => (state.showExport = true)}>
 									<i className='ion ion-md-open' />
 								</div>

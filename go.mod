@@ -5,13 +5,17 @@ go 1.18
 // CGO Problem: https://github.com/go-git/go-git/issues/624
 replace github.com/pjbgf/sha1cd => github.com/pjbgf/sha1cd v0.2.3
 
+// Replace with fork to support newer electron versions
+replace github.com/asticode/go-astilectron => github.com/BigJk/go-astilectron v0.0.1
+
 require (
 	github.com/BigJk/nra v1.0.0-rc
 	github.com/PuerkitoBio/goquery v1.5.1
 	github.com/UnnoTed/fileb0x v1.1.4
 	github.com/alexbrainman/printer v0.0.0-20181008173622-345afe414dee
+	github.com/antchfx/xmlquery v1.3.13
 	github.com/asdine/storm v2.1.2+incompatible
-	github.com/asticode/go-astikit v0.37.0
+	github.com/asticode/go-astikit v0.29.1
 	github.com/asticode/go-astilectron v0.27.0
 	github.com/asticode/go-astilectron-bootstrap v0.4.14
 	github.com/dgraph-io/badger/v3 v3.2103.2
@@ -19,17 +23,19 @@ require (
 	github.com/fsnotify/fsnotify v1.5.1
 	github.com/go-git/go-billy/v5 v5.3.1
 	github.com/go-git/go-git/v5 v5.5.0
-	github.com/go-rod/rod v0.101.8
+	github.com/go-rod/rod v0.112.2
 	github.com/google/gousb v1.1.2
 	github.com/jwalton/go-supportscolor v1.1.0
 	github.com/labstack/echo/v4 v4.9.0
 	github.com/mattetti/filebuffer v1.0.1
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/samber/lo v1.11.0
+	github.com/sbabiv/xml2map v1.2.1
 	github.com/vmihailenco/msgpack/v5 v5.3.5
 	github.com/webview/webview v0.0.0-20221225125018-b817c55b5602
 	go.bug.st/serial v1.3.5
 	go.etcd.io/bbolt v1.3.3
+	golang.org/x/exp v0.0.0-20220303212507-bbda1eaf7a17
 	golang.org/x/net v0.2.0
 	gopkg.in/olahol/melody.v1 v1.0.0-20170518105555-d52139073376
 )
@@ -43,6 +49,7 @@ require (
 	github.com/acomagu/bufpipe v1.0.3 // indirect
 	github.com/akavel/rsrc v0.8.0 // indirect
 	github.com/andybalholm/cascadia v1.1.0 // indirect
+	github.com/antchfx/xpath v1.2.1 // indirect
 	github.com/asticode/go-astilectron-bundler v0.7.12 // indirect
 	github.com/asticode/go-bindata v1.0.0 // indirect
 	github.com/bmatcuk/doublestar v1.1.1 // indirect
@@ -58,7 +65,7 @@ require (
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b // indirect
-	github.com/golang/groupcache v0.0.0-20190702054246-869f871628b6 // indirect
+	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect
 	github.com/golang/protobuf v1.3.3 // indirect
 	github.com/golang/snappy v0.0.3 // indirect
 	github.com/google/flatbuffers v1.12.1 // indirect
@@ -86,12 +93,11 @@ require (
 	github.com/vmihailenco/msgpack v4.0.4+incompatible // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	github.com/xanzy/ssh-agent v0.3.2 // indirect
-	github.com/ysmood/goob v0.3.0 // indirect
-	github.com/ysmood/gson v0.6.4 // indirect
-	github.com/ysmood/leakless v0.7.0 // indirect
+	github.com/ysmood/goob v0.4.0 // indirect
+	github.com/ysmood/gson v0.7.3 // indirect
+	github.com/ysmood/leakless v0.8.0 // indirect
 	go.opencensus.io v0.22.5 // indirect
 	golang.org/x/crypto v0.3.0 // indirect
-	golang.org/x/exp v0.0.0-20220303212507-bbda1eaf7a17 // indirect
 	golang.org/x/sys v0.2.0 // indirect
 	golang.org/x/term v0.2.0 // indirect
 	golang.org/x/text v0.4.0 // indirect

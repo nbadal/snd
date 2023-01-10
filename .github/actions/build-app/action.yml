@@ -10,6 +10,9 @@ inputs:
   arch:
     description: 'CPU architecture to build for'
     required: true
+  armv:
+    description: 'arm version to build for'
+    required: false
   tags:
     description: 'Build tags to pass to Go'
     required: false
@@ -44,6 +47,7 @@ runs:
       env:
         GOOS: ${{ inputs.os }}
         GOARCH: ${{ inputs.arch }}
+        GOARM: ${{ inputs.armv }}
         SND_TAGS: ${{ inputs.tags }}
     - name: Run Build (MSYS2)
       if: inputs.os == 'windows' && inputs.libusb-path != null
@@ -56,7 +60,7 @@ runs:
     - name: Copy libusb DLL
       if: inputs.libusb-path != null
       shell: bash
-      run: cp ${{inputs.libusb-path}} build/
+      run: cp ${{inputs.libusb-path}} build/release/
     - name: Generate Short SHA
       shell: bash
       id: sha
@@ -64,6 +68,6 @@ runs:
     - name: Archive Build
       uses: actions/upload-artifact@v3
       with:
-        path: build/
+        path: build/release/
         name: ${{ inputs.artifact-name }}-${{ steps.sha.outputs.short }}
         if-no-files-found: error
