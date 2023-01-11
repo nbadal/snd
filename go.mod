@@ -31,6 +31,7 @@ require (
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/samber/lo v1.11.0
 	github.com/sbabiv/xml2map v1.2.1
+	github.com/shibukawa/configdir v0.0.0-20170330084843-e180dbdc8da0
 	github.com/vmihailenco/msgpack/v5 v5.3.5
 	github.com/webview/webview v0.0.0-20221225125018-b817c55b5602
 	go.bug.st/serial v1.3.5
