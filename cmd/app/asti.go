@@ -81,6 +81,7 @@ func startElectron(db database.Database, debug bool) {
 				Width:  astikit.IntPtr(1600),
 				WebPreferences: &astilectron.WebPreferences{
 					EnableRemoteModule: astikit.BoolPtr(true),
+					WebviewTag: astikit.BoolPtr(true),
 				},
 			},
 		}},
