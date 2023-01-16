@@ -41,11 +41,11 @@ jobs:
         include:
           # ELECTRON
           - arch: "amd64"
-            tags: "ELECTRON"
+            tags: "ASTI"
             artifact-name: "snd-linux-amd64-gui"
           - arch: "amd64"
             libusb: true
-            tags: "ELECTRON LIBUSB"
+            tags: "ASTI LIBUSB"
             artifact-name: "snd-linux-amd64-gui-usb"
           # HEADLESS
           - arch: "amd64"
@@ -87,11 +87,11 @@ jobs:
           # ELECTRON
           - arch: "amd64"
             libusb: false
-            tags: "ELECTRON"
+            tags: "ASTI"
             artifact-name: "snd-windows-amd64-gui"
           - arch: "amd64"
             libusb: true
-            tags: "ELECTRON LIBUSB"
+            tags: "ASTI LIBUSB"
             artifact-name: "snd-windows-amd64-gui-usb"
     steps:
     - name: Checkout Repo
@@ -127,14 +127,14 @@ jobs:
         include:
           # ELECTRON
           - arch: "amd64"
-            tags: "ELECTRON"
+            tags: "ASTI"
             artifact-name: "snd-macos-amd64-gui"
           - arch: "arm64"
-            tags: "ELECTRON"
+            tags: "ASTI"
             artifact-name: "snd-macos-arm64-gui"
           - arch: "amd64"
             libusb: true
-            tags: "ELECTRON LIBUSB"
+            tags: "ASTI LIBUSB"
             artifact-name: "snd-macos-amd64-gui-usb"
           # Note: arm64 + USB not possible until we have an M1 runner
     steps:

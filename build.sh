@@ -20,17 +20,24 @@ echo "Clearing old data..."
 rm -r ${TARGET_DIR} || true
 
 cd cmd/app
-echo "Generating bundler config..."
-JQ_CMD="""
-.build_flags.tags = \"${SND_TAGS}\" |
-.output_path = \"../../${TARGET_DIR}\" |
-.environments[0].arch = \"${GOARCH}\" |
-.environments[0].os = \"${GOOS}\"
-"""
-jq "${JQ_CMD}" -c bundler.json > bundler.gen.json
+if [[ $SND_TAGS == *"ASTI"* ]]; then
+  echo "Generating bundler config..."
+  JQ_CMD="""
+  .build_flags.tags = \"${SND_TAGS}\" |
+  .output_path = \"../../${TARGET_DIR}\" |
+  .environments[0].arch = \"${GOARCH}\" |
+  .environments[0].os = \"${GOOS}\"
+  """
+  jq "${JQ_CMD}" -c bundler.json > bundler.gen.json
 
-echo "Building App..."
-astilectron-bundler -c bundler.gen.json -ldflags "X:github.com/BigJk/snd.GitCommitHash=${GIT_COMMIT}" -ldflags "X:github.com/BigJk/snd.GitBranch=${GIT_BRANCH}" -ldflags "X:github.com/BigJk/snd.BuildTime=${BUILD_TIME}"
+  echo "Building Asti (GUI) App..."
+  astilectron-bundler -c bundler.gen.json -ldflags "X:github.com/BigJk/snd.GitCommitHash=${GIT_COMMIT}" -ldflags "X:github.com/BigJk/snd.GitBranch=${GIT_BRANCH}" -ldflags "X:github.com/BigJk/snd.BuildTime=${BUILD_TIME}"
+else 
+  echo "Building Headless (No GUI) App..."
+  LD_FLAGS="-X github.com/BigJk/snd.GitCommitHash=${GIT_COMMIT} -X github.com/BigJk/snd.GitBranch=${GIT_BRANCH} -X github.com/BigJk/snd.BuildTime=${BUILD_TIME}"
+  go build -ldflags "${LD_FLAGS}" -o app -tags "${SND_TAGS}"
+fi
+
 cd ../..
 
 # TODO: Rename output to match requested APP_NAME. app_name in bundler breaks if we pass anything with
