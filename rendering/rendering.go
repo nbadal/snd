@@ -18,6 +18,7 @@ import (
 
 	"github.com/BigJk/snd/log"
 	"github.com/go-rod/rod/lib/launcher"
+	"github.com/go-rod/rod/lib/launcher/flags"
 
 	"github.com/go-rod/rod"
 	"github.com/go-rod/rod/lib/proto"
@@ -45,6 +46,20 @@ func InitBrowser() {
 	}
 
 	l := launcher.New()
+
+	// specify a local chrome binary instead of downloading.
+	customChromeBinary := os.Getenv("SND_CHROME_BIN")
+	if len(customChromeBinary) > 0 {
+		l.Set(flags.Bin, customChromeBinary)
+	} else if os.Getenv("SND_CHROME_SKIP_LOCAL") != "1" {
+		// try to auto-detect chrome
+		if chrome, ok := launcher.LookPath(); ok {
+			l.Set(flags.Bin, chrome)
+			log.Info("local chrome found! If rendering causes problems start S&D with the environment flag SND_CHROME_SKIP_LOCAL=1", log.WithValue("bin", chrome))
+		} else {
+			log.Info("local chrome not found")
+		}
+	}
 
 	// disable leakless for now on windows (https://github.com/BigJk/snd/issues/28)
 	if runtime.GOOS == "windows" {
