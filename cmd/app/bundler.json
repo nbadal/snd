@@ -4,8 +4,5 @@
     "icon_path_linux": "../../data/icon.png",
     "version_astilectron": "0.0.1",
     "version_electron": "21.0.0",
-    "build_flags": {
-        "tags": "ASTI LIBUSB"
-    },
     "output_path": "../../build"
 }

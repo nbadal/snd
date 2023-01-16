@@ -40,4 +40,5 @@ static/*
 !static/placeholder.go
 
 # bundler
+bundler.gen.json
 cmd/app/bind*

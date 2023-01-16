@@ -6,8 +6,6 @@ package main
 import (
 	"fmt"
 	"log"
-	"os"
-	"syscall"
 
 	"github.com/BigJk/snd/database"
 	// "github.com/BigJk/snd/printing/preview"
@@ -59,7 +57,7 @@ func startElectron(db database.Database, debug bool) {
 		Asset:          Asset,
 		AssetDir:       AssetDir,
 		Debug:          debug,
-		IgnoredSignals: []os.Signal{syscall.SIGURG},
+		IgnoredSignals: ignoredSignals(),
 		Logger:         l,
 		RestoreAssets:  RestoreAssets,
 		AstilectronOptions: astilectron.Options{

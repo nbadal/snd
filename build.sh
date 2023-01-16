@@ -17,29 +17,23 @@ echo "Build Arch : ${GOARCH:=$(go env GOARCH)}"
 echo "Build Tags : ${SND_TAGS}"
 
 echo "Clearing old data..."
-rm -r ${TARGET_DIR}/frontend || true
-rm -r ${TARGET_DIR}/data || true
-rm ${TARGET_DIR}/* || true
-mkdir -p ${TARGET_DIR}/frontend/dist ${TARGET_DIR}/data
-
-echo "Building App..."
-case "${GOOS}" in
-  "windows") EXT=".exe" ;;
-  *) EXT="" ;;
-esac
-LD_FLAGS="-X github.com/BigJk/snd.GitCommitHash=${GIT_COMMIT} -X github.com/BigJk/snd.GitBranch=${GIT_BRANCH} -X github.com/BigJk/snd.BuildTime=${BUILD_TIME}"
+rm -r ${TARGET_DIR} || true
 
 cd cmd/app
-go build -ldflags "${LD_FLAGS}" -o app -tags "${SND_TAGS}"
+echo "Generating bundler config..."
+JQ_CMD="""
+.build_flags.tags = \"${SND_TAGS}\" |
+.output_path = \"../../${TARGET_DIR}\" |
+.environments[0].arch = \"${GOARCH}\" |
+.environments[0].os = \"${GOOS}\"
+"""
+jq "${JQ_CMD}" -c bundler.json > bundler.gen.json
+
+echo "Building App..."
+astilectron-bundler -c bundler.gen.json -ldflags "X:github.com/BigJk/snd.GitCommitHash=${GIT_COMMIT}" -ldflags "X:github.com/BigJk/snd.GitBranch=${GIT_BRANCH}" -ldflags "X:github.com/BigJk/snd.BuildTime=${BUILD_TIME}"
 cd ../..
-mv cmd/app/app "${TARGET_DIR}/${APP_NAME}${EXT}"
 
-echo "Copying frontend..."
-cp -r frontend/dist ${TARGET_DIR}/frontend
-
-echo "Copying resources..."
-cp data/icon.png ${TARGET_DIR}/data/icon.png
-cp data/icon.icns ${TARGET_DIR}/data/icon.icns
+# TODO: Rename output to match requested APP_NAME. app_name in bundler breaks if we pass anything with
 
 echo "Building version.txt..."
 echo "Commit: ${GIT_COMMIT}" > ${TARGET_DIR}/version.txt
