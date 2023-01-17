@@ -34,9 +34,12 @@ runs:
         cache: true
         go-version-file: go.mod
         cache-dependency-path: go.sum
+    - name: Install Bundler Tool Fork
+      shell: bash
+      run: git clone https://github.com/nbadal/go-astilectron-bundler && cd go-astilectron-bundler/astilectron-bundler && go install . && cd - && rm -r go-astilectron-bundler
     - name: Install Backend Dependencies
       shell: bash
-      run: go mod tidy && go get github.com/nbadal/go-astilectron-bundler/astilectron-bundler
+      run: go mod tidy
     - name: Generate Code
       shell: bash
       run: go generate
