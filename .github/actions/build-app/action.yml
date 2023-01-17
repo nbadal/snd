@@ -36,7 +36,7 @@ runs:
         cache-dependency-path: go.sum
     - name: Install Backend Dependencies
       shell: bash
-      run: go mod tidy
+      run: go mod tidy && go get github.com/nbadal/go-astilectron-bundler/astilectron-bundler
     - name: Generate Code
       shell: bash
       run: go generate
