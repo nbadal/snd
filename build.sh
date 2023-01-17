@@ -18,6 +18,7 @@ echo "Build Tags : ${SND_TAGS}"
 
 echo "Clearing old data..."
 rm -r ${TARGET_DIR} || true
+mkdir -p ${TARGET_DIR}
 
 cd cmd/app
 if [[ $SND_TAGS == *"ASTI"* ]]; then
