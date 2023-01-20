@@ -25,7 +25,7 @@ var serverOptions []server.Option
 var startFunc = startServer
 
 func openDatabase() database.Database {
-	configDirs := configdir.New("BigJk", "snd")
+	configDirs := configdir.New("", "snd")
 	folders := configDirs.QueryFolders(configdir.Global)
 	fmt.Println("User Data Path: " + folders[0].Path)
 	db, err := badger.New(folders[0].Path)
