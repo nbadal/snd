@@ -18,13 +18,17 @@ import (
 	"github.com/BigJk/snd/printing/serial"
 	"github.com/BigJk/snd/rendering"
 	"github.com/BigJk/snd/server"
+	"github.com/shibukawa/configdir"
 )
 
 var serverOptions []server.Option
 var startFunc = startServer
 
 func openDatabase() database.Database {
-	db, err := badger.New("./userdata/")
+	configDirs := configdir.New("", "snd")
+	folders := configDirs.QueryFolders(configdir.Global)
+	fmt.Println("User Data Path: " + folders[0].Path)
+	db, err := badger.New(folders[0].Path)
 	if err != nil {
 		panic(err)
 	}

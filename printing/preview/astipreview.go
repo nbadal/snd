@@ -1,3 +1,6 @@
+//go:build ELECTRON
+// +build ELECTRON
+
 package preview
 
 import (
@@ -11,25 +14,25 @@ import (
 	"github.com/asticode/go-astilectron"
 )
 
-type Preview struct {
+type AstiPreview struct {
 	Asti *astilectron.Astilectron
 }
 
-func (r *Preview) Name() string {
+func (r *AstiPreview) Name() string {
 	return "Preview Printing"
 }
 
-func (r *Preview) Description() string {
+func (r *AstiPreview) Description() string {
 	return "Instead of printing show a window with the result."
 }
 
-func (r *Preview) AvailableEndpoints() (map[string]string, error) {
+func (r *AstiPreview) AvailableEndpoints() (map[string]string, error) {
 	return map[string]string{
 		"Preview Printing": "window",
 	}, nil
 }
 
-func (r *Preview) Print(printerEndpoint string, image image.Image, data []byte) error {
+func (r *AstiPreview) Print(printerEndpoint string, image image.Image, data []byte) error {
 	if r.Asti == nil {
 		return errors.New("not initialized")
 	}

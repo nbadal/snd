@@ -14,7 +14,6 @@
 # Dependency directories (remove the comment below to include it)
 # vendor/
 
-static/
 node_modules/
 dist/
 vendor/
@@ -22,6 +21,7 @@ templates/
 !src/**/templates/**
 userdata/
 
+.vscode/
 .idea/
 .cache/
 cache/
@@ -34,3 +34,11 @@ build/
 
 !data/*.png
 !data/*.svg
+
+# fileb0x
+static/*
+!static/placeholder.go
+
+# bundler
+bundler.gen.json
+cmd/app/bind*
